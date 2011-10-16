@@ -1,3 +1,10 @@
+/*
+Assimp2Json
+Copyright (c) 2011, Alexander C. Gessler
+
+Licensed under a 3-clause BSD license. See the LICENSE file for more information.
+
+*/
 
 #include <assimp.hpp>
 #include <export.hpp>
@@ -39,7 +46,7 @@ int main (int argc, char *argv[])
 		return unrecog_exit(-1);
 	}
 
-	unsigned int nextarg = 1;
+	int nextarg = 1;
 	while(nextarg < argc && argv[nextarg][0] == '-') {
 		if (!strcmp(argv[nextarg],"--help")) {
 			printhelp();
