@@ -108,12 +108,26 @@ public:
 		buff << '\"' << s.data << "\"\n";
 	}
 
+	void SimpleValue(const void* buffer, size_t len) {
+		std::stringstream tmp;
+		tmp.imbue( std::locale("C") );
+		tmp << std::hex;
+		for(size_t i = 0; i < len; ++i) {
+			tmp << static_cast<const char*>(buffer)[i];
+		}
+
+		buff << '\"' << tmp.str() << "\"\n";
+	}
+
 	void StartObj(bool is_element = false) {
-		if(is_element && !first) {
-			buff << ',';
+		// if this appears as a plain array element, we need to insert a delimiter and we should also indent it
+		if(is_element) {
+			AddIndentation();
+			if(!first) {
+				buff << ',';
+			}
 		}
 		first = true;
-		AddIndentation();
 		buff << "{\n";
 		PushIndent();
 	}
@@ -121,15 +135,18 @@ public:
 	void EndObj() {
 		PopIndent();
 		AddIndentation();
-		buff << "{\n";
+		buff << "}\n";
 	}
 
 	void StartArray(bool is_element = false) {
-		if(is_element && !first) {
-			buff << ',';
+		// if this appears as a plain array element, we need to insert a delimiter and we should also indent it
+		if(is_element) {
+			AddIndentation();
+			if(!first) {
+				buff << ',';
+			}
 		}
 		first = true;
-		AddIndentation();
 		buff << "[\n";
 		PushIndent();
 	}
@@ -167,9 +184,37 @@ private:
 };
 
 
-void Write(JSONWriter& out, const aiBone& ai)
+void Write(JSONWriter& out, const aiVector3D& ai, bool is_elem = true) 
 {
-	out.StartObj();
+	out.StartArray(is_elem);
+	out.Element(ai.x);
+	out.Element(ai.y);
+	out.Element(ai.z);
+	out.EndArray();
+}
+
+void Write(JSONWriter& out, const aiQuaternion& ai, bool is_elem = true) 
+{
+	out.StartArray(is_elem);
+	out.Element(ai.w);
+	out.Element(ai.x);
+	out.Element(ai.y);
+	out.Element(ai.z);
+	out.EndArray();
+}
+
+void Write(JSONWriter& out, const aiColor3D& ai, bool is_elem = true) 
+{
+	out.StartArray(is_elem);
+	out.Element(ai.r);
+	out.Element(ai.g);
+	out.Element(ai.b);
+	out.EndArray();
+}
+
+void Write(JSONWriter& out, const aiBone& ai, bool is_elem = true)
+{
+	out.StartObj(is_elem);
 
 	out.Key("name");
 	out.SimpleValue(ai.mName);
@@ -190,9 +235,9 @@ void Write(JSONWriter& out, const aiBone& ai)
 }
 
 
-void Write(JSONWriter& out, const aiFace& ai)
+void Write(JSONWriter& out, const aiFace& ai, bool is_elem = true)
 {
-	out.StartArray();
+	out.StartArray(is_elem);
 	for(unsigned int i = 0; i < ai.mNumIndices; ++i) {
 		out.Element(ai.mIndices[i]);
 	}
@@ -200,9 +245,9 @@ void Write(JSONWriter& out, const aiFace& ai)
 }
 
 
-void Write(JSONWriter& out, const aiMesh& ai)
+void Write(JSONWriter& out, const aiMesh& ai, bool is_elem = true)
 {
-	out.StartObj(); 
+	out.StartObj(is_elem); 
 
 	out.Key("name");
 	out.SimpleValue(ai.mName);
@@ -297,7 +342,6 @@ void Write(JSONWriter& out, const aiMesh& ai)
 		out.Key("bones");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumBones; ++n) {
-			out.Delimit();
 			Write(out, *ai.mBones[n]);
 		}
 		out.EndArray();
@@ -307,7 +351,6 @@ void Write(JSONWriter& out, const aiMesh& ai)
 	out.Key("faces");
 	out.StartArray();
 	for(unsigned int n = 0; n < ai.mNumFaces; ++n) {
-		out.Delimit();
 		Write(out, ai.mFaces[n]);
 	}
 	out.EndArray();
@@ -316,9 +359,9 @@ void Write(JSONWriter& out, const aiMesh& ai)
 }
 
 
-void Write(JSONWriter& out, const aiNode& ai)
+void Write(JSONWriter& out, const aiNode& ai, bool is_elem = true)
 {
-	out.StartObj();
+	out.StartObj(is_elem);
 
 	out.Key("name");
 	out.SimpleValue(ai.mName);
@@ -339,7 +382,6 @@ void Write(JSONWriter& out, const aiNode& ai)
 		out.Key("children");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumChildren; ++n) {
-			out.Delimit();
 			Write(out,*ai.mChildren[n]);
 		}
 		out.EndArray();
@@ -348,30 +390,266 @@ void Write(JSONWriter& out, const aiNode& ai)
 	out.EndObj();
 }
 
-void Write(JSONWriter& out, const aiMaterial& ai)
+void Write(JSONWriter& out, const aiMaterial& ai, bool is_elem = true)
 {
-	out.StartObj();
+	out.StartObj(is_elem);
+
+	out.Key("properties");
+	out.StartArray();
+	for(unsigned int i = 0; i < ai.mNumProperties; ++i) {
+		const aiMaterialProperty* const prop = ai.mProperties[i];
+		out.StartObj(true);
+		out.Key("key");
+		out.SimpleValue(prop->mKey);
+		out.Key("semantic");
+		out.SimpleValue(prop->mSemantic);
+		out.Key("index");
+		out.SimpleValue(prop->mIndex);
+
+		out.Key("type");
+		out.SimpleValue(prop->mType);
+
+		out.Key("value");
+		switch(prop->mType)
+		{
+		case aiPTI_Float:
+			if(prop->mDataLength/sizeof(float) > 1) {
+				out.StartArray();
+				for(unsigned int i = 0; i < prop->mDataLength/sizeof(float); ++i) {
+					out.Element(reinterpret_cast<float*>(prop->mData)[i]);
+				}
+				out.EndArray();
+			}
+			else {
+				out.SimpleValue(*reinterpret_cast<float*>(prop->mData));
+			}
+			break;
+
+		case aiPTI_Integer:
+			if(prop->mDataLength/sizeof(int) > 1) {
+				out.StartArray();
+				for(unsigned int i = 0; i < prop->mDataLength/sizeof(int); ++i) {
+					out.Element(reinterpret_cast<int*>(prop->mData)[i]);
+				}
+				out.EndArray();
+			}
+			else {
+				out.SimpleValue(*reinterpret_cast<int*>(prop->mData));
+			}
+			break;
+		case aiPTI_String: 
+			{
+				aiString s;
+				aiGetMaterialString(&ai,prop->mKey.data,prop->mSemantic,prop->mIndex,&s);
+				out.SimpleValue(s);
+			}
+			break;
+		case aiPTI_Buffer:
+			{
+				// binary data is written as series of hex-encoded octets
+				out.SimpleValue(prop->mData,prop->mDataLength);
+			}
+			break;
+		default:
+			assert(false);
+		}
+
+		out.EndObj();
+	}
+
+	out.EndArray();
+	out.EndObj();
+}
+
+void Write(JSONWriter& out, const aiTexture& ai, bool is_elem = true)
+{
+	out.StartObj(is_elem);
+
+	out.Key("width");
+	out.SimpleValue(ai.mWidth);
+
+	out.Key("height");
+	out.SimpleValue(ai.mHeight);
+
+	out.Key("formathint");
+	out.SimpleValue(aiString(ai.achFormatHint));
+
+	out.Key("data");
+	if(!ai.mHeight) {
+		out.SimpleValue(ai.pcData,ai.mWidth);
+	}
+	else {
+		out.StartArray();
+		for(unsigned int y = 0; y < ai.mHeight; ++y) {
+			out.StartArray(true);
+			for(unsigned int x = 0; x < ai.mWidth; ++x) {
+				const aiTexel& tx = ai.pcData[y*ai.mWidth+x];
+				out.StartArray(true);
+				out.Element(static_cast<unsigned int>(tx.r));
+				out.Element(static_cast<unsigned int>(tx.g));
+				out.Element(static_cast<unsigned int>(tx.b));
+				out.Element(static_cast<unsigned int>(tx.a));
+				out.EndArray();
+			}
+			out.EndArray();
+		}
+		out.EndArray();
+	}
 
 	out.EndObj();
 }
 
-void Write(JSONWriter& out, const aiTexture& ai)
+void Write(JSONWriter& out, const aiLight& ai, bool is_elem = true)
 {
-	out.StartObj();
+	out.StartObj(is_elem);
+
+	out.Key("name");
+	out.SimpleValue(ai.mName);
+
+	out.Key("type");
+	out.SimpleValue(ai.mType);
+
+	if(ai.mType == aiLightSource_SPOT || ai.mType == aiLightSource_UNDEFINED) {
+		out.Key("angleinnercone");
+		out.SimpleValue(ai.mAngleInnerCone);
+
+		out.Key("angleoutercone");
+		out.SimpleValue(ai.mAngleOuterCone);
+	}
+
+	out.Key("attenuationconstant");
+	out.SimpleValue(ai.mAttenuationConstant);
+
+	out.Key("attenuationlinear");
+	out.SimpleValue(ai.mAttenuationLinear);
+
+	out.Key("attenuationquadratic");
+	out.SimpleValue(ai.mAttenuationQuadratic);
+
+	out.Key("diffusecolor");
+	Write(out,ai.mColorDiffuse,false);
+
+	out.Key("specularcolor");
+	Write(out,ai.mColorSpecular,false);
+
+	out.Key("ambientcolor");
+	Write(out,ai.mColorAmbient,false);
+
+	if(ai.mType != aiLightSource_POINT) {
+		out.Key("direction");
+		Write(out,ai.mDirection,false);
+
+	}
+
+	if(ai.mType != aiLightSource_DIRECTIONAL) {
+		out.Key("position");
+		Write(out,ai.mPosition,false);
+	}
 
 	out.EndObj();
 }
 
-void Write(JSONWriter& out, const aiLight& ai)
+void Write(JSONWriter& out, const aiNodeAnim& ai, bool is_elem = true)
 {
-	out.StartObj();
+	out.StartObj(is_elem);
 
+	out.Key("name");
+	out.SimpleValue(ai.mNodeName);
+
+	out.Key("prestate");
+	out.SimpleValue(ai.mPreState);
+
+	out.Key("poststate");
+	out.SimpleValue(ai.mPostState);
+
+	if(ai.mNumPositionKeys) {
+		out.Key("positionkeys");
+		out.StartArray();
+		for(unsigned int n = 0; n < ai.mNumPositionKeys; ++n) {
+			const aiVectorKey& pos = ai.mPositionKeys[n];
+			out.StartArray(true);
+			out.Element(pos.mTime);
+			Write(out,pos.mValue);
+			out.EndArray();
+		}
+		out.EndArray();
+	}
+
+	if(ai.mNumRotationKeys) {
+		out.Key("rotationkeys");
+		out.StartArray();
+		for(unsigned int n = 0; n < ai.mNumRotationKeys; ++n) {
+			const aiQuatKey& rot = ai.mRotationKeys[n];
+			out.StartArray(true);
+			out.Element(rot.mTime);
+			Write(out,rot.mValue);
+			out.EndArray();
+		}
+		out.EndArray();
+	}
+
+	if(ai.mNumScalingKeys) {
+		out.Key("scalingkeys");
+		out.StartArray();
+		for(unsigned int n = 0; n < ai.mNumScalingKeys; ++n) {
+			const aiVectorKey& scl = ai.mScalingKeys[n];
+			out.StartArray(true);
+			out.Element(scl.mTime);
+			Write(out,scl.mValue);
+			out.EndArray();
+		}
+		out.EndArray();
+	}
 	out.EndObj();
 }
 
-void Write(JSONWriter& out, const aiCamera& ai)
+void Write(JSONWriter& out, const aiAnimation& ai, bool is_elem = true)
 {
-	out.StartObj();
+	out.StartObj(is_elem);
+
+	out.Key("name");
+	out.SimpleValue(ai.mName);
+
+	out.Key("tickspersecond");
+	out.SimpleValue(ai.mTicksPerSecond);
+
+	out.Key("duration");
+	out.SimpleValue(ai.mDuration);
+
+	out.Key("channels");
+	out.StartArray();
+	for(unsigned int n = 0; n < ai.mNumChannels; ++n) {
+		Write(out,*ai.mChannels[n]);
+	}
+	out.EndArray();
+	out.EndObj();
+}
+
+void Write(JSONWriter& out, const aiCamera& ai, bool is_elem = true)
+{
+	out.StartObj(is_elem);
+
+	out.Key("name");
+	out.SimpleValue(ai.mName);
+
+	out.Key("aspect");
+	out.SimpleValue(ai.mAspect);
+
+	out.Key("clipplanefar");
+	out.SimpleValue(ai.mClipPlaneFar);
+
+	out.Key("clipplanenear");
+	out.SimpleValue(ai.mClipPlaneNear);
+
+	out.Key("horizontalfov");
+	out.SimpleValue(ai.mHorizontalFOV);
+
+	out.Key("up");
+	out.StartArray();
+	Write(out,ai.mUp,false);
+
+	out.Key("lookat");
+	Write(out,ai.mLookAt,false);
 
 	out.EndObj();
 }
@@ -381,7 +659,7 @@ void Write(JSONWriter& out, const aiScene& ai)
 	out.StartObj();
 
 	out.Key("rootnode");
-	Write(out,*ai.mRootNode);
+	Write(out,*ai.mRootNode, false);
 
 	out.Key("flags");
 	out.SimpleValue(ai.mFlags);
@@ -390,7 +668,6 @@ void Write(JSONWriter& out, const aiScene& ai)
 		out.Key("meshes");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumMeshes; ++n) {
-			out.Delimit();
 			Write(out,*ai.mMeshes[n]);
 		}
 		out.EndArray();
@@ -400,8 +677,16 @@ void Write(JSONWriter& out, const aiScene& ai)
 		out.Key("materials");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumMaterials; ++n) {
-			out.Delimit();
 			Write(out,*ai.mMaterials[n]);
+		}
+		out.EndArray();
+	}
+
+	if(ai.HasAnimations()) {
+		out.Key("animations");
+		out.StartArray();
+		for(unsigned int n = 0; n < ai.mNumAnimations; ++n) {
+			Write(out,*ai.mAnimations[n]);
 		}
 		out.EndArray();
 	}
@@ -410,7 +695,6 @@ void Write(JSONWriter& out, const aiScene& ai)
 		out.Key("lights");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumLights; ++n) {
-			out.Delimit();
 			Write(out,*ai.mLights[n]);
 		}
 		out.EndArray();
@@ -420,7 +704,6 @@ void Write(JSONWriter& out, const aiScene& ai)
 		out.Key("cameras");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumCameras; ++n) {
-			out.Delimit();
 			Write(out,*ai.mCameras[n]);
 		}
 		out.EndArray();
@@ -430,7 +713,6 @@ void Write(JSONWriter& out, const aiScene& ai)
 		out.Key("textures");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.mNumTextures; ++n) {
-			out.Delimit();
 			Write(out,*ai.mTextures[n]);
 		}
 		out.EndArray();
