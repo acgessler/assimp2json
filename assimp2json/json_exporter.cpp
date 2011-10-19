@@ -29,20 +29,6 @@ Assimp::Exporter::ExportFormatEntry Assimp2Json_desc = Assimp::Exporter::ExportF
 
 namespace {
 
-	std::ostream& operator << (std::ostream& ss,const aiMatrix4x4& s) {
-		std::stringstream buff;
-		buff.imbue( std::locale("C") );
-
-		for(unsigned int x = 0; x < 4; ++x) {
-			for(unsigned int y = 0; y < 4; ++y) {
-				if(x || y) {
-					buff << ',';
-				}
-				buff << s[x][y];
-			}
-		}
-		return ss << '[' <<  buff.str() << ']';
-	}
 
 	// small utility class to simplify serializing the aiScene to Json
 class JSONWriter
@@ -212,6 +198,17 @@ void Write(JSONWriter& out, const aiColor3D& ai, bool is_elem = true)
 	out.EndArray();
 }
 
+void Write(JSONWriter& out, const aiMatrix4x4& ai, bool is_elem = true) 
+{
+	out.StartArray(is_elem);
+	for(unsigned int x = 0; x < 4; ++x) {
+		for(unsigned int y = 0; y < 4; ++y) {
+			out.Element(ai[x][y]);
+		}
+	}
+	out.EndArray();
+}
+
 void Write(JSONWriter& out, const aiBone& ai, bool is_elem = true)
 {
 	out.StartObj(is_elem);
@@ -220,7 +217,7 @@ void Write(JSONWriter& out, const aiBone& ai, bool is_elem = true)
 	out.SimpleValue(ai.mName);
 
 	out.Key("offsetmatrix");
-	out.SimpleValue(ai.mOffsetMatrix);
+	Write(out,ai.mOffsetMatrix,false);
 
 	out.Key("weights");
 	out.StartArray();
@@ -366,8 +363,8 @@ void Write(JSONWriter& out, const aiNode& ai, bool is_elem = true)
 	out.Key("name");
 	out.SimpleValue(ai.mName);
 
-	out.Key("transform");
-	out.SimpleValue(ai.mTransformation);
+	out.Key("transformation");
+	Write(out,ai.mTransformation,false);
 
 	if(ai.mNumMeshes) {
 		out.Key("meshes");
