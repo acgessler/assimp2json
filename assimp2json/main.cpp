@@ -21,7 +21,7 @@ extern Assimp::Exporter::ExportFormatEntry Assimp2Json_desc;
 
 int unrecog_exit(int ex = -1)
 {
-	std::cout << "usage: assimp2json [--log --verbose] input output" << std::endl;
+	std::cout << "usage: assimp2json [--log --verbose] input [output]" << std::endl;
 	return ex;
 }
 
@@ -59,25 +59,38 @@ int main (int argc, char *argv[])
 		++nextarg;
 	}
 
-	if (argc != nextarg+2) {
+	if (argc < nextarg+1) {
 		return unrecog_exit(-2);
 	}
 
-	const char* in = argv[nextarg], *out = argv[nextarg+1];
-
+	const char* in = argv[nextarg], *out = (argc < nextarg+2 ? NULL : argv[nextarg+1]);
+	
 	Assimp::Importer imp;
 	const aiScene* const sc = imp.ReadFile(in,aiProcessPreset_TargetRealtime_MaxQuality);
 	if (!sc) {
-		std::cout << "failure reading file: " << in << std::endl;
+		std::cerr << "failure reading file: " << in << std::endl;
 		return -3;
 	}
 
 	Assimp::Exporter exp;
 	exp.RegisterExporter(Assimp2Json_desc);
 
-	if(aiReturn_SUCCESS != exp.Export(sc,"json",out)) {
-		std::cout << "failure writing file: " << out << ": " << exp.GetErrorString() << std::endl;
-		return -4;
+	if(out) {
+		if(aiReturn_SUCCESS != exp.Export(sc,"json",out)) {
+			std::cerr << "failure exporting file: " << out << ": " << exp.GetErrorString() << std::endl;
+			return -4;
+		}
+	}
+	else {
+		// write to stdout, but we might do better than using ExportToBlob()
+		const aiExportDataBlob* const blob = exp.ExportToBlob(sc,"json");
+		if(!blob) {
+			std::cerr << "failure exporting to (stdout) " << exp.GetErrorString() << std::endl;
+			return -5;
+		}
+
+		const std::string s(static_cast<char*>( blob->data), blob->size);
+		std::cout << s << std::endl;
 	}
 	return 0;
 }
