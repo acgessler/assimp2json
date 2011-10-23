@@ -19,7 +19,7 @@ set (EXTRA_LIBS ${EXTRA_LIBS} assimp)
 
 include_directories("assimp/include")
 
-add_executable(assimp2json assimp2json/main.cpp assimp2json/json_exporter.cpp)
+add_executable(assimp2json assimp2json/main.cpp assimp2json/json_exporter.cpp assimp2json/cencode.c)
 target_link_libraries (assimp2json  ${EXTRA_LIBS})
 
 if( MSVC_IDE )

@@ -16,6 +16,10 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 
+extern "C" {
+#include "cencode.h"
+}
+
 namespace {
 void Assimp2Json(const char* ,Assimp::IOSystem*,const aiScene*);
 }
@@ -95,14 +99,15 @@ public:
 	}
 
 	void SimpleValue(const void* buffer, size_t len) {
-		std::stringstream tmp;
-		tmp.imbue( std::locale("C") );
-		tmp << std::hex;
-		for(size_t i = 0; i < len; ++i) {
-			tmp << static_cast<const char*>(buffer)[i];
-		}
+		base64_encodestate s;
+		base64_init_encodestate(&s);
 
-		buff << '\"' << tmp.str() << "\"\n";
+		char* out = new char[std::max(len*2,16u)];
+		const int n = base64_encode_block(reinterpret_cast<const char*>( buffer ),len,out,&s);
+		out[n+base64_encode_blockend(out + n,&s)] = '\0';
+
+		buff << '\"' << out << "\"\n";
+		delete[] out;
 	}
 
 	void StartObj(bool is_element = false) {
