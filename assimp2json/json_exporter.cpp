@@ -730,7 +730,8 @@ void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene)
 		//throw Assimp::DeadlyExportError("could not open output file");
 	}
 
-	Write(JSONWriter(*str),*scene);
+	JSONWriter s(*str);
+	Write(s,*scene);
 }
 
 
