@@ -97,9 +97,6 @@ public:
 		buff << LiteralToString(s) << '\n';
 	}
 
-	void SimpleValue(const aiString& s) {
-		buff << '\"' << s.data << "\"\n";
-	}
 
 	void SimpleValue(const void* buffer, size_t len) {
 		base64_encodestate s;
@@ -176,6 +173,22 @@ private:
 
 		tmp << s;
 		return tmp.str();
+	}
+
+	std::string LiteralToString(const aiString& s) {
+		std::string t;
+
+		// escape backslashes and single quotes, both would render the JSON invalid if left as is
+		t.reserve(s.length);
+		for(size_t i = 0; i < s.length; ++i) {
+			
+			if (s.data[i] == '\\' || s.data[i] == '\'') {
+				t.push_back('\\');
+			}
+
+			t.push_back(s.data[i]);
+		}
+		return "\"" + t + "\"";
 	}
 
 	std::string LiteralToString(float f) {
