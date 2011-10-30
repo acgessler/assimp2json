@@ -58861,34 +58861,32 @@
 			,"clipplanenear": 10
 			,"horizontalfov": 0.660595
 			,"up": [
-[
-					 0
-					,1
-					,0
-				]
-				,"lookat": [
-					 0
-					,0
-					,-1
-				]
-			}
-			,{
-				 "name": "testCamera"
-				,"aspect": 1
-				,"clipplanefar": 1000
-				,"clipplanenear": 0.01
-				,"horizontalfov": 0.660609
-				,"up": [
-[
-						 0
-						,1
-						,0
-					]
-					,"lookat": [
-						 0
-						,0
-						,-1
-					]
-				}
+				 0
+				,1
+				,0
+			]
+			,"lookat": [
+				 0
+				,0
+				,-1
 			]
 		}
+		,{
+			 "name": "testCamera"
+			,"aspect": 1
+			,"clipplanefar": 1000
+			,"clipplanenear": 0.01
+			,"horizontalfov": 0.660609
+			,"up": [
+				 0
+				,1
+				,0
+			]
+			,"lookat": [
+				 0
+				,0
+				,-1
+			]
+		}
+	]
+}

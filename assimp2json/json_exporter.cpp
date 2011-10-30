@@ -105,8 +105,8 @@ public:
 		base64_encodestate s;
 		base64_init_encodestate(&s);
 
-		char* out = new char[std::max(len*2,16u)];
-		const int n = base64_encode_block(reinterpret_cast<const char*>( buffer ),len,out,&s);
+		char* out = new char[std::max(len*2, static_cast<size_t>(16u))];
+		const int n = base64_encode_block(reinterpret_cast<const char*>( buffer ), static_cast<int>( len ),out,&s);
 		out[n+base64_encode_blockend(out + n,&s)] = '\0';
 
 		buff << '\"' << out << "\"\n";
@@ -697,7 +697,6 @@ void Write(JSONWriter& out, const aiCamera& ai, bool is_elem = true)
 	out.SimpleValue(ai.mHorizontalFOV);
 
 	out.Key("up");
-	out.StartArray();
 	Write(out,ai.mUp,false);
 
 	out.Key("lookat");
@@ -781,7 +780,8 @@ void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene)
 	}
 
 	// XXX Flag_WriteSpecialFloats is turned on by defaul, right now we don't have a configuration interface for exporters
-	Write(JSONWriter(*str,JSONWriter::Flag_WriteSpecialFloats),*scene);
+	JSONWriter s(*str,JSONWriter::Flag_WriteSpecialFloats);
+	Write(s,*scene);
 }
 
 

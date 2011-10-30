@@ -92,7 +92,7 @@
 	,"meshes": [
 		{
 			 "name": "Plane"
-			,"material": 0
+			,"materialindex": 0
 			,"primitivetypes": 4
 			,"vertices": [
 				 1
@@ -328,4 +328,3 @@ AAAEAAAgAAAAAQAACAAAoL/+B6TqrjCUyuL8AAAAAElFTkSuQmCC
 		}
 	]
 }
-

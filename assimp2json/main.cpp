@@ -14,7 +14,7 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 
 #include <iostream>
 
-#include "Version.h"
+#include "version.h"
 
 // json_exporter.cpp
 extern Assimp::Exporter::ExportFormatEntry Assimp2Json_desc;
