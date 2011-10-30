@@ -304,7 +304,7 @@ void Write(JSONWriter& out, const aiMesh& ai, bool is_elem = true)
 	out.Key("name");
 	out.SimpleValue(ai.mName);
 
-	out.Key("material");
+	out.Key("materialindex");
 	out.SimpleValue(ai.mMaterialIndex);
 
 	out.Key("primitivetypes");
