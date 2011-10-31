@@ -377,9 +377,9 @@ void Write(JSONWriter& out, const aiMesh& ai, bool is_elem = true)
 			
 			out.StartArray(true);
 			for(unsigned int i = 0; i < ai.mNumVertices; ++i) {
-				out.Element(ai.mTextureCoords[n][i].x);
-				out.Element(ai.mTextureCoords[n][i].y);
-				out.Element(ai.mTextureCoords[n][i].z);
+				for(unsigned int c = 0; c < ai.mNumUVComponents[n]; ++c) {
+					out.Element(ai.mTextureCoords[n][i][c]);
+				}
 			}
 			out.EndArray();
 		}
