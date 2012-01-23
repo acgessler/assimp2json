@@ -15,6 +15,7 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
+#include <limits>
 
 extern "C" {
 #include "cencode.h"
@@ -42,6 +43,7 @@ public:
 
 	enum {
 		Flag_DoNotIndent = 0x1,
+		Flag_WriteSpecialFloats = 0x2,
 	};
 
 public:
@@ -86,17 +88,15 @@ public:
 	void Element(const Literal& name) {
 		AddIndentation();
 		Delimit();
-		buff << name << '\n';
+
+		buff << LiteralToString(name) << '\n';
 	}
 
 	template<typename Literal>
 	void SimpleValue(const Literal& s) {
-		buff << s << '\n';
+		buff << LiteralToString(s) << '\n';
 	}
 
-	void SimpleValue(const aiString& s) {
-		buff << '\"' << s.data << "\"\n";
-	}
 
 	void SimpleValue(const void* buffer, size_t len) {
 		base64_encodestate s;
@@ -164,6 +164,69 @@ public:
 		}
 	}
 
+private:
+
+	template<typename Literal>
+	std::string LiteralToString(const Literal& s) {
+		std::stringstream tmp;
+		tmp.imbue( std::locale("C") );
+
+		tmp << s;
+		return tmp.str();
+	}
+
+	std::string LiteralToString(const aiString& s) {
+		std::string t;
+
+		// escape backslashes and single quotes, both would render the JSON invalid if left as is
+		t.reserve(s.length);
+		for(size_t i = 0; i < s.length; ++i) {
+			
+			if (s.data[i] == '\\' || s.data[i] == '\'') {
+				t.push_back('\\');
+			}
+
+			t.push_back(s.data[i]);
+		}
+		return "\"" + t + "\"";
+	}
+
+	std::string LiteralToString(float f) {
+		std::stringstream tmp;
+		tmp.imbue( std::locale("C") );
+
+		if (!std::numeric_limits<float>::is_iec559) {
+			// on a non IEEE-754 platform, we make no assumptions about the representation or existence
+			// of special floating-point numbers. 
+			tmp << f;
+			return tmp.str();
+		}
+
+		// JSON does not support writing Inf/Nan
+		// [RFC 4672: "Numeric values that cannot be represented as sequences of digits
+		// (such as Infinity and NaN) are not permitted."]
+		// Nevertheless, many parsers will accept the special keywords Infinity, -Infinity and NaN
+		if (std::numeric_limits<float>::infinity() == fabs(f)) {
+			if (flags & Flag_WriteSpecialFloats) {
+				return (f < 0 ? "\"-" : "\"") + std::string( "Infinity\"" );
+			}
+		//  we should print this warning, but we can't - this is called from within a generic assimp exporter, we cannot use cerr
+		//	std::cerr << "warning: cannot represent infinite number literal, substituting 0 instead (use -i flag to enforce Infinity/NaN)" << std::endl;
+			return "0.0";
+		}
+		// f!=f is the most reliable test for NaNs that I know of
+		else if (f != f) {
+			if (flags & Flag_WriteSpecialFloats) {
+				return "\"NaN\"";
+			}
+		//  we should print this warning, but we can't - this is called from within a generic assimp exporter, we cannot use cerr
+		//	std::cerr << "warning: cannot represent infinite number literal, substituting 0 instead (use -i flag to enforce Infinity/NaN)" << std::endl;
+			return "0.0";
+		}
+
+		tmp << f;
+		return tmp.str();
+	}
 
 private: 
 	Assimp::IOStream& out;
@@ -254,7 +317,7 @@ void Write(JSONWriter& out, const aiMesh& ai, bool is_elem = true)
 	out.Key("name");
 	out.SimpleValue(ai.mName);
 
-	out.Key("material");
+	out.Key("materialindex");
 	out.SimpleValue(ai.mMaterialIndex);
 
 	out.Key("primitivetypes");
@@ -314,9 +377,9 @@ void Write(JSONWriter& out, const aiMesh& ai, bool is_elem = true)
 			
 			out.StartArray(true);
 			for(unsigned int i = 0; i < ai.mNumVertices; ++i) {
-				out.Element(ai.mTextureCoords[n][i].x);
-				out.Element(ai.mTextureCoords[n][i].y);
-				out.Element(ai.mTextureCoords[n][i].z);
+				for(unsigned int c = 0; c < ai.mNumUVComponents[n]; ++c) {
+					out.Element(ai.mTextureCoords[n][i][c]);
+				}
 			}
 			out.EndArray();
 		}
@@ -729,7 +792,8 @@ void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene)
 		//throw Assimp::DeadlyExportError("could not open output file");
 	}
 
-	JSONWriter s(*str);
+	// XXX Flag_WriteSpecialFloats is turned on by defaul, right now we don't have a configuration interface for exporters
+	JSONWriter s(*str,JSONWriter::Flag_WriteSpecialFloats);
 	Write(s,*scene);
 }
 

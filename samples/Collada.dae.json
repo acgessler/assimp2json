@@ -158,7 +158,7 @@
 	,"meshes": [
 		{
 			 "name": ""
-			,"material": 1
+			,"materialindex": 1
 			,"primitivetypes": 4
 			,"vertices": [
 				 -400
@@ -203,7 +203,7 @@
 		}
 		,{
 			 "name": ""
-			,"material": 0
+			,"materialindex": 0
 			,"primitivetypes": 4
 			,"vertices": [
 				 -165.048
