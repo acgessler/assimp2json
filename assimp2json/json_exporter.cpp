@@ -6,12 +6,12 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 
 */
 
-#include <assimp.hpp>
-#include <export.hpp>
-#include <IOStream.h>
-#include <IOSystem.h>
+#include <assimp/Importer.hpp>
+#include <assimp/Exporter.hpp>
+#include <assimp/IOStream.hpp>
+#include <assimp/IOSystem.hpp>
 
-#include <aiScene.h>
+#include <assimp/scene.h>
 
 #include <sstream>
 #include <boost/scoped_ptr.hpp>

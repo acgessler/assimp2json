@@ -6,11 +6,11 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 
 */
 
-#include <assimp.hpp>
-#include <export.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/Exporter.hpp>
 
-#include <aiVersion.h>
-#include <aiPostProcess.h>
+#include <assimp/version.h>
+#include <assimp/postprocess.h>
 
 #include <iostream>
 
