@@ -14,8 +14,11 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 #include <assimp/scene.h>
 
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
 #include <limits>
+#include <cassert>
+
+// grab scoped_ptr from assimp to avoid a dependency on boost
+#include <assimp/../../code/BoostWorkaround/boost/scoped_ptr.hpp>
 
 extern "C" {
 #include "cencode.h"
