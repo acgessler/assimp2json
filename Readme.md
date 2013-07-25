@@ -11,7 +11,7 @@ assimp2json is platform-independent, its only dependency is Assimp itself.
 
 ### Output Format ###
 
-The output format is a one-by-one translation of Assimp's C datastructure (http://assimp.sourceforge.net/lib_html/structai_scene.html), with a few changes to make the resulting JSON look more natural. All fields are lower-case and the prefixes (such as m, pc, ..) are omitted. Array lengths are not written because; this information is implicitly contained in the arrays. Empty arrays are not written, i.e. a node without children doesn't have an empty `children:[]` field.
+The output format is a one-by-one translation of Assimp's C datastructure (http://assimp.sourceforge.net/lib_html/structai_scene.html), with a few changes to make the resulting JSON look more natural. All fields are lower-case and the prefixes (such as m, pc, ..) are omitted. Array lengths are not written because this information is implicitly contained in the arrays. Empty arrays are not written, i.e. a node without children doesn't have an empty `children:[]` field.
 
 The /samples folder contains some sample JSON dumps.
 
