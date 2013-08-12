@@ -92,12 +92,12 @@ public:
 		AddIndentation();
 		Delimit();
 
-		buff << LiteralToString(name) << '\n';
+		LiteralToString(buff, name) << '\n';
 	}
 
 	template<typename Literal>
 	void SimpleValue(const Literal& s) {
-		buff << LiteralToString(s) << '\n';
+		LiteralToString(buff, s) << '\n';
 	}
 
 
@@ -170,15 +170,12 @@ public:
 private:
 
 	template<typename Literal>
-	std::string LiteralToString(const Literal& s) {
-		std::stringstream tmp;
-		tmp.imbue( std::locale("C") );
-
-		tmp << s;
-		return tmp.str();
+	std::stringstream& LiteralToString(std::stringstream& stream, const Literal& s) {
+		stream << s;
+		return stream;
 	}
 
-	std::string LiteralToString(const aiString& s) {
+	std::stringstream& LiteralToString(std::stringstream& stream, const aiString& s) {
 		std::string t;
 
 		// escape backslashes and single quotes, both would render the JSON invalid if left as is
@@ -191,18 +188,18 @@ private:
 
 			t.push_back(s.data[i]);
 		}
-		return "\"" + t + "\"";
+		stream << "\"";
+		stream << t;
+		stream << "\"";
+		return stream;
 	}
 
-	std::string LiteralToString(float f) {
-		std::stringstream tmp;
-		tmp.imbue( std::locale("C") );
-
+	std::stringstream& LiteralToString(std::stringstream& stream, float f) {
 		if (!std::numeric_limits<float>::is_iec559) {
 			// on a non IEEE-754 platform, we make no assumptions about the representation or existence
 			// of special floating-point numbers. 
-			tmp << f;
-			return tmp.str();
+			stream << f;
+			return stream;
 		}
 
 		// JSON does not support writing Inf/Nan
@@ -211,24 +208,28 @@ private:
 		// Nevertheless, many parsers will accept the special keywords Infinity, -Infinity and NaN
 		if (std::numeric_limits<float>::infinity() == fabs(f)) {
 			if (flags & Flag_WriteSpecialFloats) {
-				return (f < 0 ? "\"-" : "\"") + std::string( "Infinity\"" );
+				stream << (f < 0 ? "\"-" : "\"") + std::string( "Infinity\"" );
+				return stream;
 			}
 		//  we should print this warning, but we can't - this is called from within a generic assimp exporter, we cannot use cerr
 		//	std::cerr << "warning: cannot represent infinite number literal, substituting 0 instead (use -i flag to enforce Infinity/NaN)" << std::endl;
-			return "0.0";
+			stream << "0.0";
+			return stream;
 		}
 		// f!=f is the most reliable test for NaNs that I know of
 		else if (f != f) {
 			if (flags & Flag_WriteSpecialFloats) {
-				return "\"NaN\"";
+				stream << "\"NaN\"";
+				return stream;
 			}
 		//  we should print this warning, but we can't - this is called from within a generic assimp exporter, we cannot use cerr
 		//	std::cerr << "warning: cannot represent infinite number literal, substituting 0 instead (use -i flag to enforce Infinity/NaN)" << std::endl;
-			return "0.0";
+			stream << "0.0";
+			return stream;
 		}
 
-		tmp << f;
-		return tmp.str();
+		stream << f;
+		return stream;
 	}
 
 private: 
