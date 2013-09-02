@@ -789,9 +789,9 @@ void Write(JSONWriter& out, const aiScene& ai)
 		}
 		out.EndArray();
 	}
-
 	out.EndObj();
 }
+
 
 void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene) 
 {
@@ -800,15 +800,26 @@ void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene)
 		//throw Assimp::DeadlyExportError("could not open output file");
 	}
 
-	// split meshes so they fit into a 16 bit index buffer
-	MeshSplitter splitter;
-	splitter.SetLimit(1 << 16);
-	splitter.Execute(const_cast<aiScene*>(scene));
+	// get a copy of the scene so we can modify it
+	aiScene* scenecopy_tmp;
+	aiCopyScene(scene, &scenecopy_tmp);
 
-	// XXX Flag_WriteSpecialFloats is turned on by default, right now we don't have a configuration interface for exporters
-	JSONWriter s(*str,JSONWriter::Flag_WriteSpecialFloats);
-	Write(s,*scene);
+	try {
+		// split meshes so they fit into a 16 bit index buffer
+		MeshSplitter splitter;
+		splitter.SetLimit(1 << 16);
+		splitter.Execute(scenecopy_tmp);
+
+		// XXX Flag_WriteSpecialFloats is turned on by default, right now we don't have a configuration interface for exporters
+		JSONWriter s(*str,JSONWriter::Flag_WriteSpecialFloats);
+		Write(s,*scenecopy_tmp);
+
+	}
+	catch(...) {
+		aiFreeScene(scenecopy_tmp);
+		throw;
+	}
+	aiFreeScene(scenecopy_tmp);
 }
 
-
-}
+} // 
