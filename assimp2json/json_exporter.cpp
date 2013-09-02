@@ -17,8 +17,12 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 #include <limits>
 #include <cassert>
 
-// grab scoped_ptr from assimp to avoid a dependency on boost
+
+// grab scoped_ptr from assimp to avoid a dependency on boost. 
 #include <assimp/../../code/BoostWorkaround/boost/scoped_ptr.hpp>
+
+#include "mesh_splitter.h"
+
 
 extern "C" {
 #include "cencode.h"
@@ -796,7 +800,12 @@ void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene)
 		//throw Assimp::DeadlyExportError("could not open output file");
 	}
 
-	// XXX Flag_WriteSpecialFloats is turned on by defaul, right now we don't have a configuration interface for exporters
+	// split meshes so they fit into a 16 bit index buffer
+	MeshSplitter splitter;
+	splitter.SetLimit(1 << 16);
+	splitter.Execute(const_cast<aiScene*>(scene));
+
+	// XXX Flag_WriteSpecialFloats is turned on by default, right now we don't have a configuration interface for exporters
 	JSONWriter s(*str,JSONWriter::Flag_WriteSpecialFloats);
 	Write(s,*scene);
 }
