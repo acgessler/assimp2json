@@ -133,6 +133,7 @@ public:
 	void EndObj() {
 		PopIndent();
 		AddIndentation();
+		first = false;
 		buff << "}\n";
 	}
 
