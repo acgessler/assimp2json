@@ -109,13 +109,22 @@ public:
 		base64_encodestate s;
 		base64_init_encodestate(&s);
 
-		char* out = new char[std::max(len*2, static_cast<size_t>(16u))];
+		char* const out = new char[std::max(len*2, static_cast<size_t>(16u))];
 		const int n = base64_encode_block(reinterpret_cast<const char*>( buffer ), static_cast<int>( len ),out,&s);
 		out[n+base64_encode_blockend(out + n,&s)] = '\0';
 
+		// base64 encoding may add newlines, but JSON strings may not contain 'real' newlines
+		// (only escaped ones). Remove any newlines in out.
+		for(char* cur = out; *cur; ++cur) {
+			if(*cur == '\n') {
+				*cur = ' ';
+			}
+		}
+
+
 		buff << '\"' << out << "\"\n";
 		delete[] out;
-	}
+	} 
 
 	void StartObj(bool is_element = false) {
 		// if this appears as a plain array element, we need to insert a delimiter and we should also indent it
