@@ -2,17 +2,17 @@
 	 "rootnode": {
 		 "name": "VisualSceneNode"
 		,"transformation": [
-			 1
+			 0.01
 			,0
 			,0
 			,0
 			,0
-			,1
+			,0.01
 			,0
 			,0
 			,0
 			,0
-			,1
+			,0.01
 			,0
 			,0
 			,0
@@ -157,7 +157,7 @@
 	,"flags": 8
 	,"meshes": [
 		{
-			 "name": ""
+			 "name": "floor"
 			,"materialindex": 1
 			,"primitivetypes": 4
 			,"vertices": [
@@ -202,7 +202,7 @@
 			]
 		}
 		,{
-			 "name": ""
+			 "name": "collada"
 			,"materialindex": 0
 			,"primitivetypes": 4
 			,"vertices": [
