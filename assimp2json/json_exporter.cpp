@@ -392,10 +392,12 @@ void Write(JSONWriter& out, const aiMesh& ai, bool is_elem = true)
 		out.Key("texturecoords");
 		out.StartArray();
 		for(unsigned int n = 0; n < ai.GetNumUVChannels(); ++n) {
+
+			const unsigned int numc = ai.mNumUVComponents[n] ? ai.mNumUVComponents[n] : 2;
 			
 			out.StartArray(true);
 			for(unsigned int i = 0; i < ai.mNumVertices; ++i) {
-				for(unsigned int c = 0; c < ai.mNumUVComponents[n]; ++c) {
+				for(unsigned int c = 0; c < numc; ++c) {
 					out.Element(ai.mTextureCoords[n][i][c]);
 				}
 			}
