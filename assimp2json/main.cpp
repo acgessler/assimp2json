@@ -74,9 +74,9 @@ int main (int argc, char *argv[])
 	imp.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_POINT | aiPrimitiveType_LINE);
 
 	// instruct aiProcess_GenSmoothNormals to not smooth normals with an angle of more than 45deg
-	imp.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, AI_MATH_HALF_PI_F * 0.5f );
+	imp.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 45.0f);
 	// instruct aiProcess_CalcTangents to not smooth normals with an angle of more than 45deg
-	imp.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, AI_MATH_HALF_PI_F * 0.5f );
+	imp.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 45.0f);
 
 	const aiScene* const sc = imp.ReadFile(in,aiProcessPreset_TargetRealtime_MaxQuality);
 	if (!sc) {
