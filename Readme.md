@@ -5,6 +5,8 @@ assimp2json
 
 Convert files in 40+ file format, including __Collada, 3DS, OBJ, LWO, FBX, Blender, X, STL, PLY, MS3D__ and __IFC__.
 
+![quak](http://s21.postimg.org/nu1bfiobr/dwarf22.png)
+
 ### Introduction ###
 
 `assimp2json` is a command line tool designed to expose the import capabilities of `assimp`, the [Open Asset Import Library](http://assimp.sourceforge.net) to /Web developers. The tool takes a single 3d model as input file, imports it using `assimp` and converts the result to `json`.
