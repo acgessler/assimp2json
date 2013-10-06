@@ -11,6 +11,7 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 
 #include <assimp/version.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include <iostream>
 
@@ -66,6 +67,17 @@ int main (int argc, char *argv[])
 	const char* in = argv[nextarg], *out = (argc < nextarg+2 ? NULL : argv[nextarg+1]);
 	
 	Assimp::Importer imp;
+
+	// instruct aiProcess_FindDegenerates to drop degenerates 
+	imp.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
+	// instruct aiProcess_SortByPrimitiveType to drop line and point meshes
+	imp.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_POINT | aiPrimitiveType_LINE);
+
+	// instruct aiProcess_GenSmoothNormals to not smooth normals with an angle of more than 45deg
+	imp.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, AI_MATH_HALF_PI_F * 0.5f );
+	// instruct aiProcess_CalcTangents to not smooth normals with an angle of more than 45deg
+	imp.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, AI_MATH_HALF_PI_F * 0.5f );
+
 	const aiScene* const sc = imp.ReadFile(in,aiProcessPreset_TargetRealtime_MaxQuality);
 	if (!sc) {
 		std::cerr << "failure reading file: " << in << std::endl;
