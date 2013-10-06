@@ -29,7 +29,7 @@ int unrecog_exit(int ex = -1)
 void printver() 
 {
 	std::cout << "assimp2json v" << ASSIMP2JSON_VERSION_MAJOR << "." << ASSIMP2JSON_VERSION_MINOR << "\n";
-	std::cout << "(c) 2011, Alexander C. Gessler\nLicensed under a 3-clause BSD license\n" <<
+	std::cout << "(c) 2013, Alexander C. Gessler\nThis is free software, made available under a 3-clause BSD license\n" <<
 		"(assimp version: " 
 		<< aiGetVersionMajor() << "." 
 		<< aiGetVersionMinor() << "." 
@@ -73,10 +73,10 @@ int main (int argc, char *argv[])
 	// instruct aiProcess_SortByPrimitiveType to drop line and point meshes
 	imp.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_POINT | aiPrimitiveType_LINE);
 
-	// instruct aiProcess_GenSmoothNormals to not smooth normals with an angle of more than 45deg
-	imp.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 45.0f);
-	// instruct aiProcess_CalcTangents to not smooth normals with an angle of more than 45deg
-	imp.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 45.0f);
+	// instruct aiProcess_GenSmoothNormals to not smooth normals with an angle of more than 70deg
+	imp.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 70.0f);
+	// instruct aiProcess_CalcTangents to not smooth normals with an angle of more than 70deg
+	imp.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 70.0f);
 
 	const aiScene* const sc = imp.ReadFile(in,aiProcessPreset_TargetRealtime_MaxQuality);
 	if (!sc) {
