@@ -3,6 +3,8 @@ assimp2json
 
 #### JSON exporter for Open Asset Import Library ####
 
+Convert files in 40+ file format, including __Collada, 3DS, OBJ, LWO, FBX, Blender, X, STL, PLY, MS3D__ and __IFC__.
+
 ### Introduction ###
 
 `assimp2json` is a command line tool designed to expose the import capabilities of `assimp`, the [Open Asset Import Library](http://assimp.sourceforge.net) to /Web developers. The tool takes a single 3d model as input file, imports it using `assimp` and converts the result to `json`.
