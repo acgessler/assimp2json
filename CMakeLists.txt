@@ -2,11 +2,11 @@ cmake_minimum_required (VERSION 2.6)
 project (assimp2json)
 
 # The version number.
-set (ASSIMP2JSON_VERSION_MAJOR 1)
+set (ASSIMP2JSON_VERSION_MAJOR 2)
 set (ASSIMP2JSON_VERSION_MINOR 0)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
  
 # configure a header file to pass some of the CMake settings
 # to the source code
