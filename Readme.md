@@ -35,6 +35,9 @@ $ assimp2json [flags] input_file [output_file]
 
 Invoke `assimp2json` with no arguments for detailed information.
 
+### Future Plans ###
+
+I plan to build a proper content pipeline for WebGl assets based on assimp, assimp2json, possibly OpenCTM, WebP and Crunch/DXT to be able to preprocess 3D assets and their textures for fast streaming. Stay tuned, or drop me a note if you want to help out.
 
 
 
