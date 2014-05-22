@@ -34,3 +34,7 @@ if( MSVC_IDE )
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/assimp/code/$(ConfigurationName)/assimp.dll ${CMAKE_BINARY_DIR}/$(ConfigurationName)/assimp.dll
    )
 endif( MSVC_IDE )
+
+INSTALL( TARGETS assimp2json 
+	 LIBRARY DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
+	 RUNTIME DESTINATION ${ASSIMP_BIN_INSTALL_DIR})
