@@ -6,6 +6,7 @@ assimp2json
 Convert files in 40+ 3D file formats, including __Collada, 3DS, OBJ, LWO, FBX, Blender, X, STL, PLY, MS3D, B3D, MD3, MDL, DXF__ and __IFC__ to plain `json`.
 
 [__Convert models online here__.](http://www.greentoken.de/onlineconv/) (Select JSON as output format)
+
 [__Download Windows binaries here__.](https://github.com/acgessler/assimp2json/releases) (_v2.0, October 2013_)
 
 ![quak](http://s21.postimg.org/nu1bfiobr/dwarf22.png)
