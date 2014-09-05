@@ -1,5 +1,8 @@
 {
-	 "rootnode": {
+	 "__format__": {
+		 "assimp2json": 100
+	}
+	,"rootnode": {
 		 "name": "RootNode"
 		,"transformation": [
 			 0.01
