@@ -17,6 +17,7 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 #include <limits>
 #include <cassert>
 
+#define CURRENT_FORMAT_VERSION 100
 
 // grab scoped_ptr from assimp to avoid a dependency on boost. 
 #include <assimp/../../code/BoostWorkaround/boost/scoped_ptr.hpp>
@@ -33,9 +34,9 @@ void Assimp2Json(const char* ,Assimp::IOSystem*,const aiScene*);
 }
 
 Assimp::Exporter::ExportFormatEntry Assimp2Json_desc = Assimp::Exporter::ExportFormatEntry(
-	"json",
+	"assimp.json",
 	"Plain JSON representation of the Assimp scene data structure",
-	"json",
+	"assimp.json",
 	Assimp2Json,
 	0u);
 
@@ -738,9 +739,20 @@ void Write(JSONWriter& out, const aiCamera& ai, bool is_elem = true)
 	out.EndObj();
 }
 
+void WriteFormatInfo(JSONWriter& out)
+{
+	out.StartObj();
+	out.Key("assimp2json");
+	out.SimpleValue(CURRENT_FORMAT_VERSION);
+	out.EndObj();
+}
+
 void Write(JSONWriter& out, const aiScene& ai)
 {
 	out.StartObj();
+
+	out.Key("__format__");
+	WriteFormatInfo(out);
 
 	out.Key("rootnode");
 	Write(out,*ai.mRootNode, false);

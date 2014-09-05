@@ -88,14 +88,14 @@ int main (int argc, char *argv[])
 	exp.RegisterExporter(Assimp2Json_desc);
 
 	if(out) {
-		if(aiReturn_SUCCESS != exp.Export(sc,"json",out)) {
+		if(aiReturn_SUCCESS != exp.Export(sc,"assimp.json",out)) {
 			std::cerr << "failure exporting file: " << out << ": " << exp.GetErrorString() << std::endl;
 			return -4;
 		}
 	}
 	else {
 		// write to stdout, but we might do better than using ExportToBlob()
-		const aiExportDataBlob* const blob = exp.ExportToBlob(sc,"json");
+		const aiExportDataBlob* const blob = exp.ExportToBlob(sc,"assimp.json");
 		if(!blob) {
 			std::cerr << "failure exporting to (stdout) " << exp.GetErrorString() << std::endl;
 			return -5;
