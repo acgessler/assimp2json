@@ -21,7 +21,13 @@ Convert files in 40+ 3D file formats, including __Collada, 3DS, OBJ, LWO, FBX, B
 
 The output format is a one-by-one translation of [Assimp's C datastructure](http://assimp.sourceforge.net/lib_html/structai_scene.html) , with a few changes to make the resulting `json` look more natural. All fields are lower-case and the prefixes (such as m, pc, ..) are omitted. Array lengths are not written as this information is implicitly given. Empty arrays are not written at all, i.e. a node without children doesn't have an empty `children:[]` field.
 
-The `/samples` folder contains some sample `json` files.
+The `/samples` folder contains some sample `assimp.json` files.
+
+Assimp2json files carry a little format header in the JSON root element. This allows them to be disambiguated from other JSON-based 3D formats (such as Three.JS scenes). The numeric value specifies the assimp2json format version in (major, minor, revision) format. Currently, only 100 is defined.
+
+    __format__": {
+		   "assimp2json": 100
+	  }
 
 ### Build ###
 
