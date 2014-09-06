@@ -742,7 +742,9 @@ void Write(JSONWriter& out, const aiCamera& ai, bool is_elem = true)
 void WriteFormatInfo(JSONWriter& out)
 {
 	out.StartObj();
-	out.Key("assimp2json");
+	out.Key("format");
+	out.SimpleValue("assimp2json");
+	out.Key("version");
 	out.SimpleValue(CURRENT_FORMAT_VERSION);
 	out.EndObj();
 }
@@ -751,7 +753,7 @@ void Write(JSONWriter& out, const aiScene& ai)
 {
 	out.StartObj();
 
-	out.Key("__format__");
+	out.Key("__metadata__");
 	WriteFormatInfo(out);
 
 	out.Key("rootnode");

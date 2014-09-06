@@ -25,9 +25,10 @@ The `/samples` folder contains some sample `assimp.json` files.
 
 `assimp.json` files carry a little format header in the JSON root element. This allows them to be disambiguated from other JSON-based 3D formats (such as Three.JS scenes). The numeric value specifies the assimp2json format version in (major, minor, revision) format. Currently, only 100 is defined.
 
-    __format__": {
-		   "assimp2json": 100
-	  }
+     "__metadata__": {
+	 	 "format" : "assimp2json"
+	 	,"version": 100
+	 }
 
 ### Build ###
 

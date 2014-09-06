@@ -1,6 +1,7 @@
 {
-	 "__format__": {
-		 "assimp2json": 100
+	 "__metadata__": {
+	 	 "format" : "assimp2json"
+	 	,"version": 100
 	}
 	,"rootnode": {
 		 "name": "$dummy_root"
