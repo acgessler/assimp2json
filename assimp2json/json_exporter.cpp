@@ -197,7 +197,7 @@ private:
 		t.reserve(s.length);
 		for(size_t i = 0; i < s.length; ++i) {
 			
-			if (s.data[i] == '\\' || s.data[i] == '\'') {
+			if (s.data[i] == '\\' || s.data[i] == '\'' || s.data[i] == '\"') {
 				t.push_back('\\');
 			}
 
@@ -743,7 +743,7 @@ void WriteFormatInfo(JSONWriter& out)
 {
 	out.StartObj();
 	out.Key("format");
-	out.SimpleValue("assimp2json");
+	out.SimpleValue("\"assimp2json\"");
 	out.Key("version");
 	out.SimpleValue(CURRENT_FORMAT_VERSION);
 	out.EndObj();
