@@ -164,6 +164,7 @@ public:
 		PopIndent();
 		AddIndentation();
 		buff << "]\n";
+		first = false;
 	}
 
 	void AddIndentation() {
