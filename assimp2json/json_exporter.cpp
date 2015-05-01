@@ -30,7 +30,7 @@ extern "C" {
 }
 
 namespace {
-void Assimp2Json(const char* ,Assimp::IOSystem*,const aiScene*);
+void Assimp2Json(const char*, Assimp::IOSystem*, const aiScene*, const Assimp::ExportProperties*);
 }
 
 Assimp::Exporter::ExportFormatEntry Assimp2Json_desc = Assimp::Exporter::ExportFormatEntry(
@@ -820,7 +820,7 @@ void Write(JSONWriter& out, const aiScene& ai)
 }
 
 
-void Assimp2Json(const char* file,Assimp::IOSystem* io,const aiScene* scene) 
+void Assimp2Json(const char* file, Assimp::IOSystem* io, const aiScene* scene, const Assimp::ExportProperties*) 
 {
 	boost::scoped_ptr<Assimp::IOStream> str(io->Open(file,"wt"));
 	if(!str) {
